@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tile {
     int _i, _j;
 
-    GameObject _piece;
+    ChessPiece _piece;
     GameObject _tile;
 
     public Tile(int i, int j, GameObject tile){
@@ -14,7 +14,15 @@ public class Tile {
         _tile = tile;
     }
 
+    public void addChessPiece(ChessPiece piece){
+        _piece = piece;
+    }
+
     public void makeBlack(){
         _tile.GetComponent<SpriteRenderer>().color = Color.black;
+    }
+
+    public void makeBlue(){
+        _tile.GetComponent<SpriteRenderer>().color = Color.blue;
     }
 }
