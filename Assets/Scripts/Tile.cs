@@ -6,23 +6,33 @@ public class Tile {
     int _i, _j;
 
     ChessPiece _piece;
-    GameObject _tile;
+    GameObject _gameObject;
 
-    public Tile(int i, int j, GameObject tile){
+    public Tile(int i, int j, GameObject gameObject){
         _i = i;
         _j = j;
-        _tile = tile;
+        _gameObject = gameObject;
+        _piece = null;
     }
 
-    public void addChessPiece(ChessPiece piece){
-        _piece = piece;
+    public ChessPiece piece{
+        get {return _piece;}
+        set {_piece = value;}
+    }
+
+    public GameObject gameObject{
+        get{return _gameObject;}
+    }
+
+    public void removePiece(){
+        _piece = null;
     }
 
     public void makeBlack(){
-        _tile.GetComponent<SpriteRenderer>().color = Color.black;
+        gameObject.GetComponent<SpriteRenderer>().color = Color.black;
     }
 
     public void makeBlue(){
-        _tile.GetComponent<SpriteRenderer>().color = Color.blue;
+        gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
     }
 }

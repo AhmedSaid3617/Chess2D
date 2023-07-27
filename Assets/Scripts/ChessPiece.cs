@@ -6,7 +6,7 @@ public class ChessPiece{
     string _type, _team;
     char _initialPosition;
     int _i, _j;
-    GameObject gameObject;
+    GameObject _gameObject;
 
     public ChessPiece(string type, string team, char initialPosition, int i, int j){
         _type = type;
@@ -20,9 +20,18 @@ public class ChessPiece{
         return _type + " " + _team + " " + _initialPosition;
     }
 
-    public GameObject GameObject{
-        get {return gameObject;}
-        set {gameObject = value;}
+    public GameObject gameObject{
+        get {return _gameObject;}
+        set {_gameObject = value;}
+    }
 
+    public int i{
+        get{return _i;}
+        set{_i = value;}
+    }
+
+    public int j{
+        get{return _j;}
+        set{_j = value;}
     }
 }
