@@ -19,4 +19,10 @@ public class ChessPiece{
     public string toString(){
         return _type + " " + _team + " " + _initialPosition;
     }
+
+    public GameObject GameObject{
+        get {return gameObject;}
+        set {gameObject = value;}
+
+    }
 }

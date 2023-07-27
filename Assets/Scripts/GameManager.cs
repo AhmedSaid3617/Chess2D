@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject myPiece;
     public GameObject tilePrefab;
-
     private ChessPiece[] chessPieces = new ChessPiece[32];
+    
 
     void addInitialPieces(){
-        string[] piecesTypes = {"rook", "knight", "bishop"};
+        string[] piecesTypes3 = {"rook", "knight", "bishop"};
+        string[] piecesTypes2 = {"king", "queen"};
         
         for (int i=0; i<8; i++){
             chessPieces[i] = new ChessPiece("pawn", "white", (char)i, i, 2);
@@ -19,11 +19,17 @@ public class GameManager : MonoBehaviour
         int a = 15;
 
         for (int i=0; i<3; i++){
-            chessPieces[++a] = new ChessPiece(piecesTypes[i], "white", 'l', i, 0);
-            chessPieces[++a] = new ChessPiece(piecesTypes[i], "black", 'l', i, 7);
-            chessPieces[++a] = new ChessPiece(piecesTypes[i], "white", 'r', 7-i, 0);
-            chessPieces[++a] = new ChessPiece(piecesTypes[i], "black", 'r', 7-i, 0);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "white", 'l', i, 0);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "black", 'l', i, 7);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "white", 'r', 7-i, 0);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "black", 'r', 7-i, 0);
         }
+
+        chessPieces[++a] = new ChessPiece("queen", "white", 'n', 3, 0);
+        chessPieces[++a] = new ChessPiece("queen", "black", 'n', 3, 7);
+        chessPieces[++a] = new ChessPiece("king", "white", 'n', 4, 0);
+        chessPieces[++a] = new ChessPiece("king", "black", 'n', 3, 7);
+
 
     }
 
