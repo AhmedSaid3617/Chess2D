@@ -16,10 +16,6 @@ public class ChessPiece{
         _j = j;
     }
 
-    public string toString(){
-        return _type + " " + _team + " " + _initialPosition;
-    }
-
     public GameObject gameObject{
         get {return _gameObject;}
         set {_gameObject = value;}
@@ -34,4 +30,13 @@ public class ChessPiece{
         get{return _j;}
         set{_j = value;}
     }
+
+    public string team{
+        get {return _team;}
+    }
+    
+    public string toString(){
+        return _type + " " + _team + " " + _initialPosition;
+    }
+
 }

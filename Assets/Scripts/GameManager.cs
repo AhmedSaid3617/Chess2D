@@ -7,6 +7,15 @@ public class GameManager : MonoBehaviour
     public GameObject tilePrefab;
     private ChessPiece[] chessPieces = new ChessPiece[32];
     public GameObject[] piecesPrefabs = new GameObject[12];
+    private Tile[,] grid;
+    public Vector2 detectionBoxSize = new Vector2(0.2f, 0.2f);
+    public Camera mainCamera;
+    private Vector3 mousePosition;
+    private Vector2 mouseWorldPosition;
+    private Collider2D selectedTileColl;
+    private Tile selectedTile;
+    private string[] STATES = {"white-select", "white-play", "black-select", "black-play"};
+    private int currentState;
 
     void addInitialPieces(){
         string[] piecesTypes3 = {"rook", "knight", "bishop"};
@@ -53,12 +62,46 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void sideSelect(string side){
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j<8; j++){
+                if(grid[i,j].piece != null){
+                    if(grid[i,j].piece.team == side){
+                        grid[i, j].isSelectable = true;
+                        Debug.Log(i);
+                    } 
+                }
+                
+            }
+        }
+    }
+
+    void findSelectedTile(){
+        mousePosition = Input.mousePosition;
+        Debug.Log(mousePosition.x);
+        mousePosition.z = mainCamera.nearClipPlane;
+        mouseWorldPosition = mainCamera.ScreenToWorldPoint(mousePosition);
+        selectedTileColl = Physics2D.OverlapBox(mouseWorldPosition, detectionBoxSize, 0);
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j<8; j++){
+                if(grid[i, j].gameObject == selectedTileColl.gameObject){
+                    selectedTile = grid[i, j];
+                    break;
+                }
+            }
+        }
+
+        if(selectedTile.isSelectable){
+            selectedTile.gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         Tile tile;
         // Creates grid of tiles.
-        Tile[,] grid = new Tile[8, 8];
+        grid = new Tile[8, 8];
 
         // Addes tiles to the grid.        
         for (int i = 0; i < 8; i++){
@@ -82,20 +125,17 @@ public class GameManager : MonoBehaviour
         }
 
         initialRender(grid);
-/*
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                if (grid[i, j].piece != null){
-                    Debug.Log(grid[i, j].piece.toString());
-                }
-            }
-        }
-*/
+
+        currentState = 0;
+        
+        sideSelect("black");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetMouseButtonDown(0)){
+            findSelectedTile();
+        }
     }
 }
