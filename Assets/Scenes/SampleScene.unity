@@ -250,6 +250,8 @@ MonoBehaviour:
   - {fileID: 1681574009657963564, guid: 754dbe39d2b09354e949ed52c0fc07c1, type: 3}
   - {fileID: 919133665795099798, guid: 51187f1fe03c29c47ba0932257c8690f, type: 3}
   - {fileID: 3410035795394115281, guid: e5abe726fbfe5ac40822e9dd43ad6b33, type: 3}
+  detectionBoxSize: {x: 0.2, y: 0.2}
+  mainCamera: {fileID: 519420031}
 --- !u!4 &860959315
 Transform:
   m_ObjectHideFlags: 0

@@ -32,6 +32,16 @@ public class Tile {
         set{_isSelectable = value;}
     }
 
+    public int i{
+        get{return _i;}
+        set{_i = value;}
+    }
+
+    public int j{
+        get{return _j;}
+        set{_j = value;}
+    }
+
     public void removePiece(){
         _piece = null;
     }
@@ -41,6 +51,6 @@ public class Tile {
     }
 
     public void makeBlue(){
-        gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+        gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
     }
 }

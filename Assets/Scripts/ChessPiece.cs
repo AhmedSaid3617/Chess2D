@@ -34,6 +34,10 @@ public class ChessPiece{
     public string team{
         get {return _team;}
     }
+
+    public string type{
+        get {return _type;}
+    }
     
     public string toString(){
         return _type + " " + _team + " " + _initialPosition;

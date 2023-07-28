@@ -14,30 +14,35 @@ public class GameManager : MonoBehaviour
     private Vector2 mouseWorldPosition;
     private Collider2D selectedTileColl;
     private Tile selectedTile;
-    private string[] STATES = {"white-select", "white-play", "black-select", "black-play"};
+    private string[] STATES = { "white-select", "white-play", "black-select", "black-play" };
     private int currentState;
+    private Moves movesObject = new Moves();
+    private List<(int, int)> availableMoves;
 
-    void addInitialPieces(){
-        string[] piecesTypes3 = {"rook", "knight", "bishop"};
-        string[] piecesTypes2 = {"king", "queen"};
-        
-        for (int i=0; i<8; i++){
+    void addInitialPieces()
+    {
+        string[] piecesTypes3 = { "rook", "knight", "bishop" };
+        string[] piecesTypes2 = { "king", "queen" };
+
+        for (int i = 0; i < 8; i++)
+        {
             chessPieces[i] = new ChessPiece("pawn", "white", (char)i, i, 1);
             chessPieces[i].gameObject = Instantiate(piecesPrefabs[0], new Vector3(-10, -10, 1), Quaternion.identity);
-            chessPieces[i+8] = new ChessPiece("pawn", "black", (char)i, i, 6);
-            chessPieces[i+8].gameObject = Instantiate(piecesPrefabs[6], new Vector3(-10, -10, 1), Quaternion.identity);
+            chessPieces[i + 8] = new ChessPiece("pawn", "black", (char)i, i, 6);
+            chessPieces[i + 8].gameObject = Instantiate(piecesPrefabs[6], new Vector3(-10, -10, 1), Quaternion.identity);
         }
         int a = 15;
 
-        for (int i=0; i<3; i++){
+        for (int i = 0; i < 3; i++)
+        {
             chessPieces[++a] = new ChessPiece(piecesTypes3[i], "white", 'l', i, 0);
-            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i+1], new Vector3(-10, -10, 1), Quaternion.identity);
+            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i + 1], new Vector3(-10, -10, 1), Quaternion.identity);
             chessPieces[++a] = new ChessPiece(piecesTypes3[i], "black", 'l', i, 7);
-            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i+7], new Vector3(-10, -10, 1), Quaternion.identity);
-            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "white", 'r', 7-i, 0);
-            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i+1], new Vector3(-10, -10, 1), Quaternion.identity);
-            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "black", 'r', 7-i, 7);
-            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i+7], new Vector3(-10, -10, 1), Quaternion.identity);
+            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i + 7], new Vector3(-10, -10, 1), Quaternion.identity);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "white", 'r', 7 - i, 0);
+            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i + 1], new Vector3(-10, -10, 1), Quaternion.identity);
+            chessPieces[++a] = new ChessPiece(piecesTypes3[i], "black", 'r', 7 - i, 7);
+            chessPieces[a].gameObject = Instantiate(piecesPrefabs[i + 7], new Vector3(-10, -10, 1), Quaternion.identity);
         }
 
         chessPieces[++a] = new ChessPiece("queen", "white", 'n', 3, 0);
@@ -50,49 +55,95 @@ public class GameManager : MonoBehaviour
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[11], new Vector3(-10, -10, 1), Quaternion.identity);
     }
 
-    void initialRender(Tile[,] grid){
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                Tile tile = grid[i,j];
+    void quickRender(Tile[,] grid)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Tile tile = grid[i, j];
                 ChessPiece piece = tile.piece;
-                if (piece != null){
+                if (piece != null)
+                {
                     piece.gameObject.transform.position = tile.gameObject.transform.position;
                 }
             }
         }
     }
 
-    void sideSelect(string side){
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j<8; j++){
-                if(grid[i,j].piece != null){
-                    if(grid[i,j].piece.team == side){
+    void sideSelect(string side)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i, j].piece != null)
+                {
+                    if (grid[i, j].piece.team == side)
+                    {
                         grid[i, j].isSelectable = true;
-                        Debug.Log(i);
-                    } 
+                    }
                 }
-                
+
             }
         }
     }
 
-    void findSelectedTile(){
+    Tile findSelectedTile()
+    {
+        Tile selectedTile;
         mousePosition = Input.mousePosition;
-        Debug.Log(mousePosition.x);
         mousePosition.z = mainCamera.nearClipPlane;
         mouseWorldPosition = mainCamera.ScreenToWorldPoint(mousePosition);
         selectedTileColl = Physics2D.OverlapBox(mouseWorldPosition, detectionBoxSize, 0);
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j<8; j++){
-                if(grid[i, j].gameObject == selectedTileColl.gameObject){
-                    selectedTile = grid[i, j];
-                    break;
+
+        if (selectedTileColl != null)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (grid[i, j].gameObject == selectedTileColl.gameObject)
+                    {
+                        selectedTile = grid[i, j];
+                        return selectedTile;
+                    }
                 }
             }
         }
+        return null;
+    }
 
-        if(selectedTile.isSelectable){
-            selectedTile.gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
+    void enforceState(int state)
+    {
+        if (state == 0)
+        {
+            sideSelect("white");
+        }
+
+        else if (state == 2)
+        {
+            sideSelect("black");
+        }
+    }
+
+    List<(int, int)> findMoves(Tile tile, Tile[,] grid){
+        List<(int, int)> moves = new List<(int, int)>();
+        int i = tile.i;
+        int j = tile.j;
+
+        if (tile.piece.type == "pawn"){
+            moves = movesObject.pawnMoves(tile, grid, i, j);
+        }
+
+        return moves;
+    }
+
+    void allowMoves(List<(int, int)> moves, Tile[,] grid)
+    {
+        for(int k=0; k<moves.Count; k++){
+            grid[moves[0].Item1, moves[0].Item2].isSelectable = true;
+            grid[moves[0].Item1, moves[0].Item2].makeBlue();
         }
     }
 
@@ -104,12 +155,15 @@ public class GameManager : MonoBehaviour
         grid = new Tile[8, 8];
 
         // Addes tiles to the grid.        
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j<8; j++){
-                tile = new Tile(i, j, Instantiate(tilePrefab, new Vector3(i*2, j*2, 2), Quaternion.identity) );
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                tile = new Tile(i, j, Instantiate(tilePrefab, new Vector3(i * 2, j * 2, 2), Quaternion.identity));
                 grid[i, j] = tile;
 
-                if((i%2 == 0) && (j%2 == 0) || (j%2 == 1) && (i%2 == 1)){
+                if ((i % 2 == 0) && (j % 2 == 0) || (j % 2 == 1) && (i % 2 == 1))
+                {
                     grid[i, j].makeBlack();
                 }
             }
@@ -118,24 +172,32 @@ public class GameManager : MonoBehaviour
         // Creates ChessPiece objects.
         addInitialPieces();
 
-        for(int k=0; k<chessPieces.Length; k++){
+        for (int k = 0; k < chessPieces.Length; k++)
+        {
             int i = chessPieces[k].i;
             int j = chessPieces[k].j;
             grid[i, j].piece = chessPieces[k];
         }
 
-        initialRender(grid);
+        quickRender(grid);
 
         currentState = 0;
-        
-        sideSelect("black");
+
+        enforceState(currentState);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0)){
-            findSelectedTile();
+        if (Input.GetMouseButtonDown(0))
+        {
+            selectedTile = findSelectedTile();
+            if (selectedTile != null){
+                if (selectedTile.isSelectable){
+                    availableMoves = findMoves(selectedTile, grid);
+                    allowMoves(availableMoves, grid);
+                }
+            }
         }
     }
 }
