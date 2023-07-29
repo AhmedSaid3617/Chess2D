@@ -136,14 +136,26 @@ public class GameManager : MonoBehaviour
             moves = movesObject.pawnMoves(tile, grid, i, j);
         }
 
+        for (int k=0; k<moves.Count; k++){
+            if(i<0 || i>7 || j<0 || j>7){
+                moves.Remove(moves[k]);
+            }
+
+            else if(grid[moves[k].Item1, moves[k].Item2].piece != null){
+                if (grid[moves[k].Item1, moves[k].Item2].piece.team == tile.piece.team){
+                    moves.Remove(moves[k]);
+                }
+            }
+        }
+
         return moves;
     }
 
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
         for(int k=0; k<moves.Count; k++){
-            grid[moves[0].Item1, moves[0].Item2].isSelectable = true;
-            grid[moves[0].Item1, moves[0].Item2].makeBlue();
+            grid[moves[k].Item1, moves[k].Item2].isSelectable = true;
+            grid[moves[k].Item1, moves[k].Item2].makeBlue();
         }
     }
 
@@ -160,6 +172,7 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < 8; j++)
             {
                 tile = new Tile(i, j, Instantiate(tilePrefab, new Vector3(i * 2, j * 2, 2), Quaternion.identity));
+                tile.color = Color.white;
                 grid[i, j] = tile;
 
                 if ((i % 2 == 0) && (j % 2 == 0) || (j % 2 == 1) && (i % 2 == 1))
@@ -191,6 +204,11 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            for (int i=0; i<8; i++){
+                for (int j=0; j<8; j++){
+                    
+                }
+            }
             selectedTile = findSelectedTile();
             if (selectedTile != null){
                 if (selectedTile.isSelectable){

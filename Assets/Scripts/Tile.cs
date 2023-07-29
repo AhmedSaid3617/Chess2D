@@ -9,6 +9,7 @@ public class Tile {
 
     ChessPiece _piece;
     GameObject _gameObject;
+    Color _color;
 
     public Tile(int i, int j, GameObject gameObject){
         _i = i;
@@ -42,12 +43,18 @@ public class Tile {
         set{_j = value;}
     }
 
+    public Color color{
+        get{return _color;}
+        set{_color = value;}
+    }
+
     public void removePiece(){
         _piece = null;
     }
 
     public void makeBlack(){
         gameObject.GetComponent<SpriteRenderer>().color = Color.black;
+        _color = Color.black;
     }
 
     public void makeBlue(){
