@@ -14,10 +14,11 @@ public class GameManager : MonoBehaviour
     private Vector2 mouseWorldPosition;
     private Collider2D selectedTileColl;
     private Tile selectedTile;
-    private string[] STATES = { "white-select", "white-play", "black-select", "black-play" };
-    private int currentState;
+    private bool whitePlay;
     private Moves movesObject = new Moves();
     private List<(int, int)> availableMoves;
+    private ChessPiece chosenPiece;
+    private List<ChessPiece> deadPieces = new List<ChessPiece>();
 
     void addInitialPieces()
     {
@@ -114,14 +115,14 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    void enforceState(int state)
+    void enforceState(bool state)
     {
-        if (state == 0)
+        if (state)
         {
             sideSelect("white");
         }
 
-        else if (state == 2)
+        else
         {
             sideSelect("black");
         }
@@ -154,9 +155,27 @@ public class GameManager : MonoBehaviour
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
         for(int k=0; k<moves.Count; k++){
-            grid[moves[k].Item1, moves[k].Item2].isSelectable = true;
-            grid[moves[k].Item1, moves[k].Item2].makeBlue();
+            grid[moves[k].Item1, moves[k].Item2].lightUP();
         }
+    }
+
+    void resetGridColors(){
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                grid[i, j].reset();
+            }
+        }
+    }
+
+    void movePiece(ChessPiece piece, Tile tile){
+        if(tile.piece != null){
+            deadPieces.Add(tile.piece);
+            Destroy(tile.piece.gameObject);
+        }
+        tile.piece = piece;
+        grid[piece.i, piece.j].removePiece();
+        piece.i = tile.i;
+        piece.j = tile.j;
     }
 
     // Start is called before the first frame update
@@ -172,7 +191,6 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < 8; j++)
             {
                 tile = new Tile(i, j, Instantiate(tilePrefab, new Vector3(i * 2, j * 2, 2), Quaternion.identity));
-                tile.color = Color.white;
                 grid[i, j] = tile;
 
                 if ((i % 2 == 0) && (j % 2 == 0) || (j % 2 == 1) && (i % 2 == 1))
@@ -194,9 +212,9 @@ public class GameManager : MonoBehaviour
 
         quickRender(grid);
 
-        currentState = 0;
+        whitePlay = true;
 
-        enforceState(currentState);
+        enforceState(whitePlay);
     }
 
     // Update is called once per frame
@@ -204,16 +222,25 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            for (int i=0; i<8; i++){
-                for (int j=0; j<8; j++){
-                    
-                }
-            }
+
+            enforceState(whitePlay);
+
             selectedTile = findSelectedTile();
             if (selectedTile != null){
+
                 if (selectedTile.isSelectable){
+                    resetGridColors();
+                    enforceState(whitePlay);
+                    chosenPiece = selectedTile.piece;
                     availableMoves = findMoves(selectedTile, grid);
                     allowMoves(availableMoves, grid);
+                }
+
+                if (selectedTile.isAllowed){
+                    movePiece(chosenPiece, selectedTile);
+                    quickRender(grid);
+                    whitePlay ^= true;
+                    resetGridColors();
                 }
             }
         }

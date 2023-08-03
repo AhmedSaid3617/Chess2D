@@ -12,29 +12,61 @@ public class Moves
     {
         List<(int, int)> moves = new List<(int, int)>();
 
-        moves.Add((i, j + 1));
-        if (i - 1 > 0 && j + 1 < 8)
+        if (tile.piece.team == "white")
         {
-            if (grid[i - 1, j + 1].piece != null)
+            if(grid[i, j+1].piece == null){
+                moves.Add((i, j + 1));
+            }
+    
+            if (i - 1 >= 0 && j + 1 < 8)
             {
-                moves.Add((i - 1, j + 1));
+                if (grid[i - 1, j + 1].piece != null)
+                {
+                    moves.Add((i - 1, j + 1));
+                }
+            }
+
+            if (i + 1 < 8 && j + 1 < 8)
+            {
+                if (grid[i + 1, j + 1].piece != null)
+                {
+                    moves.Add((i + 1, j + 1));
+                }
+            }
+
+            if (j == 1)
+            {
+                moves.Add((i, j + 2));
             }
         }
 
-        if (i + 1 < 8 && j + 1 < 8)
-        {
-            if (grid[i + 1, j + 1].piece != null)
-            {
-                moves.Add((i + 1, j + 1));
+        else {
+            if(grid[i, j-1].piece == null){
+                moves.Add((i, j - 1));
             }
+
+            if (i - 1 >= 0 && j - 1 < 8)
+            {
+                if (grid[i - 1, j - 1].piece != null)
+                {
+                    moves.Add((i - 1, j - 1));
+                }
+            }
+
+            if (i + 1 < 8 && j - 1 < 8)
+            {
+                if (grid[i + 1, j - 1].piece != null)
+                {
+                    moves.Add((i + 1, j - 1));
+                }
+            }
+
+            if (j == 6)
+            {
+                moves.Add((i, j - 2));
+            }
+
         }
-
-        if (j == 1)
-        {
-            moves.Add((i, j + 2));
-        }
-
-
 
         return moves;
     }

@@ -6,6 +6,7 @@ public class Tile {
     int _i, _j;
 
     bool _isSelectable;
+    bool _isAllowed;
 
     ChessPiece _piece;
     GameObject _gameObject;
@@ -17,6 +18,8 @@ public class Tile {
         _gameObject = gameObject;
         _piece = null;
         _isSelectable = false;
+        _color = Color.white;
+        _isAllowed = false;
     }
 
     public ChessPiece piece{
@@ -45,7 +48,10 @@ public class Tile {
 
     public Color color{
         get{return _color;}
-        set{_color = value;}
+    }
+
+    public bool isAllowed{
+        get{return _isAllowed;}
     }
 
     public void removePiece(){
@@ -57,7 +63,15 @@ public class Tile {
         _color = Color.black;
     }
 
-    public void makeBlue(){
+    public void lightUP(){
         gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
+        _isSelectable = false;
+        _isAllowed = true;
+    }
+
+    public void reset(){
+        gameObject.GetComponent<SpriteRenderer>().color = _color;
+        _isSelectable = false;
+        _isAllowed = false;
     }
 }
