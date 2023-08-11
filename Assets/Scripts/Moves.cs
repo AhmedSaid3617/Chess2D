@@ -8,6 +8,14 @@ public class Moves
     {
 
     }
+
+    public bool outOfRange(int i, int j){
+        if (i>7 || i<0 || j>7 || j<0){
+            return true;
+        }
+        return false;
+    }
+
     public List<(int, int)> pawnMoves(Tile tile, Tile[,] grid, int i, int j)
     {
         List<(int, int)> moves = new List<(int, int)>();
@@ -70,4 +78,5 @@ public class Moves
 
         return moves;
     }
+
 }

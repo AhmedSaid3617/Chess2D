@@ -136,9 +136,10 @@ public class GameManager : MonoBehaviour
         if (tile.piece.type == "pawn"){
             moves = movesObject.pawnMoves(tile, grid, i, j);
         }
+        
 
         for (int k=0; k<moves.Count; k++){
-            if(i<0 || i>7 || j<0 || j>7){
+            if(movesObject.outOfRange(moves[k].Item1, moves[k].Item2)){
                 moves.Remove(moves[k]);
             }
 
