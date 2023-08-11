@@ -136,6 +136,10 @@ public class GameManager : MonoBehaviour
         if (tile.piece.type == "pawn"){
             moves = movesObject.pawnMoves(tile, grid, i, j);
         }
+
+        else if(tile.piece.type == "rook"){
+            moves = movesObject.rookMoves(tile, grid, i, j);
+        }
         
 
         for (int k=0; k<moves.Count; k++){
