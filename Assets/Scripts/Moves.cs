@@ -35,6 +35,27 @@ public class Moves
         return false;
     }
 
+
+    public void addTile(Tile tile, Tile[,] grid, List<(int, int)> moves, int new_i, int new_j){
+        // Adds tile i, j to moves if available, otherwise adds (-1, -1) to moves.
+        if (isBlocked(new_i, new_j, tile.piece.team, grid))
+        {
+            moves.Add((-1, -1));
+        }
+        else if (grid[new_i, new_j].piece != null)
+        {
+            if (grid[new_i, new_j].piece.team != tile.piece.team){
+                moves.Add((new_i, new_j));
+                moves.Add((-1, -1));
+            }
+            
+        }
+        else {
+            moves.Add((new_i, new_j));
+        }
+    }
+
+
     public List<(int, int)> pawnMoves(Tile tile, Tile[,] grid, int i, int j)
     {
         List<(int, int)> moves = new List<(int, int)>();
@@ -104,29 +125,42 @@ public class Moves
     public List<(int, int)> rookMoves(Tile tile, Tile[,] grid, int i, int j)
     {
         List<(int, int)> moves = new List<(int, int)>();
+        Debug.Log("Rook moves");
 
-        for (int k = i; k < 7 - i; k++)
+        for (int k = j+1; k < 8; k++)
         {
-            if (isBlocked(k, j, tile.piece.team, grid)){
+            addTile(tile, grid, moves, new_i:i, new_j:k);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
                 break;
             }
-            else if(grid[k, j].piece.team != tile.piece.team){
-                moves.Add((k, j));
-                break;
-            }
-            moves.Add((k, j));
         }
 
-        for (int k = j; k < 7 - i; k++)
+        for (int k = i+1; k < 8; k++)
         {
-            if (isBlocked(i, k, tile.piece.team, grid)){
+            addTile(tile, grid, moves, new_i:k, new_j:j);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
                 break;
             }
-            else if(grid[i, k].piece.team != tile.piece.team){
-                moves.Add((i, k));
+        }
+
+        for (int k = j-1; k >=0; k--)
+        {
+            addTile(tile, grid, moves, new_i:i, new_j:k);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
                 break;
             }
-            moves.Add((i, k));
+        }
+
+        for (int k = i-1; k >=0; k--)
+        {
+            addTile(tile, grid, moves, new_i:k, new_j:j);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
+                break;
+            }
         }
 
         return moves;
