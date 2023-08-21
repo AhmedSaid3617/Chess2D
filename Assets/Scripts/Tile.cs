@@ -69,6 +69,12 @@ public class Tile {
         _isAllowed = true;
     }
 
+    public void lightRed(){
+        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        _isSelectable = false;
+        _isAllowed = true;
+    }
+
     public void reset(){
         gameObject.GetComponent<SpriteRenderer>().color = _color;
         _isSelectable = false;

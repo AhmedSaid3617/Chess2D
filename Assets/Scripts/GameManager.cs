@@ -159,8 +159,13 @@ public class GameManager : MonoBehaviour
 
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
+        Tile tile;
         for(int k=0; k<moves.Count; k++){
-            grid[moves[k].Item1, moves[k].Item2].lightUP();
+            tile = grid[moves[k].Item1, moves[k].Item2];
+            tile.lightUP();
+            if (tile.piece != null){
+                tile.lightRed();
+            }
         }
     }
 
