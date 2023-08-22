@@ -144,6 +144,11 @@ public class GameManager : MonoBehaviour
         else if (tile.piece.type == "bishop"){
             moves = movesObject.bishopMoves(tile, grid, i, j);
         }
+
+        else if (tile.piece.type == "queen"){
+            moves = movesObject.rookMoves(tile, grid, i, j);
+            moves.AddRange(movesObject.bishopMoves(tile, grid, i, j));
+        }
         
 
         for (int k=0; k<moves.Count; k++){
