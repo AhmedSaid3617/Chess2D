@@ -125,7 +125,6 @@ public class Moves
     public List<(int, int)> rookMoves(Tile tile, Tile[,] grid, int i, int j)
     {
         List<(int, int)> moves = new List<(int, int)>();
-        Debug.Log("Rook moves");
 
         for (int k = j+1; k < 8; k++)
         {
@@ -157,6 +156,45 @@ public class Moves
         for (int k = i-1; k >=0; k--)
         {
             addTile(tile, grid, moves, new_i:k, new_j:j);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
+                break;
+            }
+        }
+
+        return moves;
+    }
+
+    public List<(int, int)> bishopMoves(Tile tile, Tile[,] grid, int i, int j){
+        List<(int, int)> moves = new List<(int, int)>();
+        Debug.Log("Bishop moves");
+
+        for (int k=i+1, l=j+1; k<8 && l<8; k++, l++){
+            addTile(tile, grid, moves, new_i:k, new_j:l);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
+                break;
+            }
+        }
+
+        for (int k=i+1, l=j-1; k<8 && l>=0; k++, l--){
+            addTile(tile, grid, moves, new_i:k, new_j:l);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
+                break;
+            }
+        }
+
+        for (int k=i-1, l=j-1; k>=0 && l>=0; k--, l--){
+            addTile(tile, grid, moves, new_i:k, new_j:l);
+            if (moves[moves.Count-1] == (-1, -1)){
+                moves.RemoveAt(moves.Count-1);
+                break;
+            }
+        }
+
+        for (int k=i-1, l=j+1; k>=0 && l<8; k--, l++){
+            addTile(tile, grid, moves, new_i:k, new_j:l);
             if (moves[moves.Count-1] == (-1, -1)){
                 moves.RemoveAt(moves.Count-1);
                 break;

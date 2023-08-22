@@ -137,8 +137,12 @@ public class GameManager : MonoBehaviour
             moves = movesObject.pawnMoves(tile, grid, i, j);
         }
 
-        else if(tile.piece.type == "rook"){
+        else if (tile.piece.type == "rook"){
             moves = movesObject.rookMoves(tile, grid, i, j);
+        }
+
+        else if (tile.piece.type == "bishop"){
+            moves = movesObject.bishopMoves(tile, grid, i, j);
         }
         
 
