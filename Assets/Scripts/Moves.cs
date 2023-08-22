@@ -167,7 +167,6 @@ public class Moves
 
     public List<(int, int)> bishopMoves(Tile tile, Tile[,] grid, int i, int j){
         List<(int, int)> moves = new List<(int, int)>();
-        Debug.Log("Bishop moves");
 
         for (int k=i+1, l=j+1; k<8 && l<8; k++, l++){
             addTile(tile, grid, moves, new_i:k, new_j:l);
@@ -200,6 +199,21 @@ public class Moves
                 break;
             }
         }
+
+        return moves;
+    }
+
+    public List<(int, int)> kingMoves(Tile tile, Tile[,] grid, int i, int j){
+        List<(int, int)> moves = new List<(int, int)>();
+
+        // Sides
+        for (int k = j-1; k<=j+1; k++){
+            moves.Add((i-1, k));
+            moves.Add((i+1, k));
+        }
+
+        moves.Add((i+1, j));
+        moves.Add((i-1, j));
 
         return moves;
     }

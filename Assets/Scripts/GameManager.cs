@@ -149,16 +149,22 @@ public class GameManager : MonoBehaviour
             moves = movesObject.rookMoves(tile, grid, i, j);
             moves.AddRange(movesObject.bishopMoves(tile, grid, i, j));
         }
-        
+
+        else if (tile.piece.type == "king"){
+            moves = movesObject.kingMoves(tile, grid, i, j);
+        }
+        Debug.Log(moves.Count);
 
         for (int k=0; k<moves.Count; k++){
+            Debug.Log(moves[k]);
             if(movesObject.outOfRange(moves[k].Item1, moves[k].Item2)){
-                moves.Remove(moves[k]);
+                moves.RemoveAt(k);
+                
             }
 
             else if(grid[moves[k].Item1, moves[k].Item2].piece != null){
                 if (grid[moves[k].Item1, moves[k].Item2].piece.team == tile.piece.team){
-                    moves.Remove(moves[k]);
+                    moves.RemoveAt(k);
                 }
             }
         }
