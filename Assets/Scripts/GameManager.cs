@@ -153,27 +153,23 @@ public class GameManager : MonoBehaviour
         else if (tile.piece.type == "king"){
             moves = movesObject.kingMoves(tile, grid, i, j);
         }
-        Debug.Log(moves.Count);
 
-        for (int k=0; k<moves.Count; k++){
-            Debug.Log(moves[k]);
-            if(movesObject.outOfRange(moves[k].Item1, moves[k].Item2)){
+        for (int k=moves.Count-1; k>=0; k--){
+            
+            if(movesObject.isBlocked(moves[k].Item1, moves[k].Item2, tile.piece.team, grid)){
+                Debug.Log(moves[k]);
                 moves.RemoveAt(k);
-                
-            }
-
-            else if(grid[moves[k].Item1, moves[k].Item2].piece != null){
-                if (grid[moves[k].Item1, moves[k].Item2].piece.team == tile.piece.team){
-                    moves.RemoveAt(k);
-                }
             }
         }
-
+        
         return moves;
     }
 
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
+        for(int i=0; i<moves.Count; i++){
+            //Debug.Log(moves[i]);
+        }
         Tile tile;
         for(int k=0; k<moves.Count; k++){
             tile = grid[moves[k].Item1, moves[k].Item2];

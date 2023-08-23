@@ -212,8 +212,8 @@ public class Moves
             moves.Add((i+1, k));
         }
 
-        moves.Add((i+1, j));
-        moves.Add((i-1, j));
+        moves.Add((i, j+1));
+        moves.Add((i, j-1));
 
         return moves;
     }
