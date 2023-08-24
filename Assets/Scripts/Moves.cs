@@ -55,6 +55,12 @@ public class Moves
         }
     }
 
+    private (int, int) rotateVector((int, int) vector){
+        (int, int) result;
+        vector.Item1 *= -1;
+        result = (vector.Item2, vector.Item1);
+        return result;
+    }
 
     public List<(int, int)> pawnMoves(Tile tile, Tile[,] grid, int i, int j)
     {
@@ -214,6 +220,24 @@ public class Moves
 
         moves.Add((i, j+1));
         moves.Add((i, j-1));
+
+        return moves;
+    }
+
+    public List<(int, int)> knightMoves(Tile tile, Tile[,] grid, int i, int j){
+        List<(int, int)> moves = new List<(int, int)>();
+
+        (int, int) vector1 = (1, 2);
+        (int, int) vector2 = (2, 1);
+
+        for (int k=0; k<4; k++){
+            moves.Add((i+vector1.Item1, j+vector1.Item2));
+            moves.Add((i+vector2.Item1, j+vector2.Item2));
+
+            vector1 = rotateVector(vector1);
+            vector2 = rotateVector(vector2);
+        }
+
 
         return moves;
     }

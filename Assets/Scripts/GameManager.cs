@@ -154,10 +154,13 @@ public class GameManager : MonoBehaviour
             moves = movesObject.kingMoves(tile, grid, i, j);
         }
 
+        else if (tile.piece.type == "knight"){
+            moves = movesObject.knightMoves(tile, grid, i, j);
+        }
+
         for (int k=moves.Count-1; k>=0; k--){
             
             if(movesObject.isBlocked(moves[k].Item1, moves[k].Item2, tile.piece.team, grid)){
-                Debug.Log(moves[k]);
                 moves.RemoveAt(k);
             }
         }
@@ -167,9 +170,6 @@ public class GameManager : MonoBehaviour
 
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
-        for(int i=0; i<moves.Count; i++){
-            //Debug.Log(moves[i]);
-        }
         Tile tile;
         for(int k=0; k<moves.Count; k++){
             tile = grid[moves[k].Item1, moves[k].Item2];
