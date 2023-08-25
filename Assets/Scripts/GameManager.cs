@@ -265,5 +265,9 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetKey(KeyCode.Escape)){
+            resetGridColors();
+        }
     }
 }
