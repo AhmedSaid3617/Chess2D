@@ -35,6 +35,18 @@ public class Moves
         return false;
     }
 
+    private bool isFreePawn(int i, int j, string team, Tile[,] grid){
+        if (outOfRange(i, j))
+        {
+            return true;
+        }
+        else if (grid[i, j].piece != null)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     public void addTile(Tile tile, Tile[,] grid, List<(int, int)> moves, int new_i, int new_j){
         // Adds tile i, j to moves if available, otherwise adds (-1, -1) to moves.
@@ -64,66 +76,39 @@ public class Moves
 
     public List<(int, int)> pawnMoves(Tile tile, Tile[,] grid, int i, int j)
     {
+        string team = tile.piece.team;
+        int direction = (team == "white") ? 1 : -1;
         List<(int, int)> moves = new List<(int, int)>();
 
-        if (tile.piece.team == "white")
-        {
-            if (grid[i, j + 1].piece == null)
-            {
-                moves.Add((i, j + 1));
-            }
-
-            if (i - 1 >= 0 && j + 1 < 8)
-            {
-                if (grid[i - 1, j + 1].piece != null)
-                {
-                    moves.Add((i - 1, j + 1));
+        // Forward movement.
+        if (!isFreePawn(i, j+direction*1, team, grid)){
+            moves.Add((i, j+direction*1));
+            if(team == "white" && j==1 || team == "black" && j==6){
+                if (!isFreePawn(i, j+direction*2, team, grid)){
+                    moves.Add((i, j+direction*2));
                 }
             }
-
-            if (i + 1 < 8 && j + 1 < 8)
-            {
-                if (grid[i + 1, j + 1].piece != null)
-                {
-                    moves.Add((i + 1, j + 1));
+            
+        }
+        // Left attack.
+        if (!outOfRange(i-1, j+direction*1)){
+            if (grid[i-1, j+direction*1].piece != null){
+                if(grid[i-1, j+direction*1].piece.team != team){
+                    moves.Add((i-1, j+direction*1));
                 }
-            }
-
-            if (j == 1)
-            {
-                moves.Add((i, j + 2));
             }
         }
+        
 
-        else
-        {
-            if (grid[i, j - 1].piece == null)
-            {
-                moves.Add((i, j - 1));
-            }
-
-            if (i - 1 >= 0 && j - 1 < 8)
-            {
-                if (grid[i - 1, j - 1].piece != null)
-                {
-                    moves.Add((i - 1, j - 1));
+        // Right attack.
+        if (!outOfRange(i+1, j+direction*1)){
+            if (grid[i+1, j+direction*1].piece != null){
+                if(grid[i+1, j+direction*1].piece.team != team){
+                    moves.Add((i+1, j+direction*1));
                 }
             }
-
-            if (i + 1 < 8 && j - 1 < 8)
-            {
-                if (grid[i + 1, j - 1].piece != null)
-                {
-                    moves.Add((i + 1, j - 1));
-                }
-            }
-
-            if (j == 6)
-            {
-                moves.Add((i, j - 2));
-            }
-
         }
+        
 
         return moves;
     }
