@@ -19,8 +19,13 @@ public class GameManager : MonoBehaviour
     private Moves movesObject = new Moves();
     private List<(int, int)> availableMoves;
     private ChessPiece chosenPiece;
-    private List<ChessPiece> deadPieces = new List<ChessPiece>();
-    private ChessPiece whiteKing, blackKing;
+    private List<ChessPiece> whiteDead = new List<ChessPiece>();
+    private List<ChessPiece> blackDead = new List<ChessPiece>();
+    private List<ChessPiece> whiteLiving = new List<ChessPiece>();
+    private List<ChessPiece> blackLiving = new List<ChessPiece>();
+    private List<(int, int)> whiteMoves = new List<(int, int)>();
+    private List<(int, int)> blackMoves = new List<(int, int)>();
+    
 
     void addInitialPieces()
     {
@@ -53,10 +58,17 @@ public class GameManager : MonoBehaviour
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[10], new Vector3(-10, -10, 1), Quaternion.identity);
         chessPieces[++a] = new ChessPiece("king", "white", 'n', 4, 0);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[5], new Vector3(-10, -10, 1), Quaternion.identity);
-        whiteKing = chessPieces[a];
         chessPieces[++a] = new ChessPiece("king", "black", 'n', 4, 7);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[11], new Vector3(-10, -10, 1), Quaternion.identity);
-        blackKing = chessPieces[a];
+
+        foreach (ChessPiece piece in chessPieces){
+            if(piece.team == "white"){
+                whiteLiving.Add(piece);
+            }
+            else{
+                blackLiving.Add(piece);
+            }
+        }
     }
 
     void quickRender(Tile[,] grid)
@@ -123,11 +135,13 @@ public class GameManager : MonoBehaviour
         if (state)
         {
             sideSelect("white");
+            updateMoves("white");
         }
 
         else
         {
             sideSelect("black");
+            updateMoves("black");
         }
     }
 
@@ -167,7 +181,7 @@ public class GameManager : MonoBehaviour
                 moves.RemoveAt(k);
             }
         }
-        if (recursionLevel <=1){
+        if (recursionLevel == 0){
             for (int k=moves.Count-1; k>=0; k--){
                 if(isKingThreatning(moves[k], grid, tile, recursionLevel)){
                     moves.RemoveAt(k);
@@ -199,10 +213,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void killPiece(ChessPiece piece){
+        if (piece.team == "white"){
+            whiteLiving.Remove(piece);
+            whiteDead.Add(piece);
+        }
+        else{
+            blackLiving.Remove(piece);
+            blackDead.Add(piece);
+        }
+        Destroy(piece.gameObject);
+    }
+
     void movePiece(ChessPiece piece, Tile[,] grid, Tile tile){
         if(tile.piece != null){
-            deadPieces.Add(tile.piece);
-            Destroy(tile.piece.gameObject);
+            killPiece(tile.piece);
         }
         tile.piece = piece;
         grid[piece.i, piece.j].removePiece();
@@ -242,6 +267,33 @@ public class GameManager : MonoBehaviour
 
         return false;
 
+    }
+
+    void updateMoves(string team){
+        if (team == "white"){
+            whiteMoves.Clear();
+            foreach (ChessPiece piece in whiteLiving)
+            {
+                whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+                foreach ((int, int) m in whiteMoves){
+                    Debug.Log(m);
+                }
+            }
+        }
+        
+        else{
+            blackMoves.Clear();
+            foreach (ChessPiece piece in blackLiving)
+            {
+                blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+                foreach ((int, int) m in blackMoves){
+                    Debug.Log(m);
+                }
+            }
+        }
+
+        
+        
     }
 
     // Start is called before the first frame update
