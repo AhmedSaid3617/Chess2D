@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -18,12 +19,17 @@ public class GameManager : MonoBehaviour
     private Moves movesObject = new Moves();
     private List<(int, int)> availableMoves;
     private ChessPiece chosenPiece;
-    private List<ChessPiece> deadPieces = new List<ChessPiece>();
+    private List<ChessPiece> whiteDead = new List<ChessPiece>();
+    private List<ChessPiece> blackDead = new List<ChessPiece>();
+    private List<ChessPiece> whiteLiving = new List<ChessPiece>();
+    private List<ChessPiece> blackLiving = new List<ChessPiece>();
+    private List<(int, int)> whiteMoves = new List<(int, int)>();
+    private List<(int, int)> blackMoves = new List<(int, int)>();
+    
 
     void addInitialPieces()
     {
         string[] piecesTypes3 = { "rook", "knight", "bishop" };
-        string[] piecesTypes2 = { "king", "queen" };
 
         for (int i = 0; i < 8; i++)
         {
@@ -54,6 +60,15 @@ public class GameManager : MonoBehaviour
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[5], new Vector3(-10, -10, 1), Quaternion.identity);
         chessPieces[++a] = new ChessPiece("king", "black", 'n', 4, 7);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[11], new Vector3(-10, -10, 1), Quaternion.identity);
+
+        foreach (ChessPiece piece in chessPieces){
+            if(piece.team == "white"){
+                whiteLiving.Add(piece);
+            }
+            else{
+                blackLiving.Add(piece);
+            }
+        }
     }
 
     void quickRender(Tile[,] grid)
@@ -120,15 +135,17 @@ public class GameManager : MonoBehaviour
         if (state)
         {
             sideSelect("white");
+            updateMoves("white");
         }
 
         else
         {
             sideSelect("black");
+            updateMoves("black");
         }
     }
 
-    List<(int, int)> findMoves(Tile tile, Tile[,] grid){
+    List<(int, int)> findMoves(Tile tile, Tile[,] grid, int recursionLevel){
         List<(int, int)> moves = new List<(int, int)>();
         int i = tile.i;
         int j = tile.j;
@@ -164,6 +181,14 @@ public class GameManager : MonoBehaviour
                 moves.RemoveAt(k);
             }
         }
+        if (recursionLevel == 0){
+            for (int k=moves.Count-1; k>=0; k--){
+                if(isKingThreatning(moves[k], grid, tile, recursionLevel)){
+                    moves.RemoveAt(k);
+                }
+            }
+        }
+        
         
         return moves;
     }
@@ -188,15 +213,87 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void movePiece(ChessPiece piece, Tile tile){
+    void killPiece(ChessPiece piece){
+        if (piece.team == "white"){
+            whiteLiving.Remove(piece);
+            whiteDead.Add(piece);
+        }
+        else{
+            blackLiving.Remove(piece);
+            blackDead.Add(piece);
+        }
+        Destroy(piece.gameObject);
+    }
+
+    void movePiece(ChessPiece piece, Tile[,] grid, Tile tile){
         if(tile.piece != null){
-            deadPieces.Add(tile.piece);
-            Destroy(tile.piece.gameObject);
+            killPiece(tile.piece);
         }
         tile.piece = piece;
         grid[piece.i, piece.j].removePiece();
         piece.i = tile.i;
         piece.j = tile.j;
+    }
+
+    bool isKingThreatning((int , int) move, Tile[,] grid, Tile origin, int recursionLevel){
+        Tile[,] new_grid = new Tile[8, 8];
+        string team = origin.piece.team;
+        List<(int, int)> enemy_moves = new List<(int,int)>();
+
+        for(int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                new_grid[i, j] = grid[i, j].copy();
+            }
+        }
+
+        movePiece(new_grid[origin.i, origin.j].piece, new_grid, new_grid[move.Item1, move.Item2]);
+
+        for(int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                if(new_grid[i, j].piece != null){
+                    if(new_grid[i, j].piece.team != team){
+                        enemy_moves = findMoves(new_grid[i, j], new_grid, recursionLevel+1);
+                        foreach ((int, int)m in enemy_moves){
+                            if(new_grid[m.Item1, m.Item2].piece != null){
+                                if(new_grid[m.Item1, m.Item2].piece.type == "king"){
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    void updateMoves(string team){
+        if (team == "white"){
+            whiteMoves.Clear();
+            foreach (ChessPiece piece in whiteLiving)
+            {
+                whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+                foreach ((int, int) m in whiteMoves){
+                    Debug.Log(m);
+                }
+            }
+        }
+        
+        else{
+            blackMoves.Clear();
+            foreach (ChessPiece piece in blackLiving)
+            {
+                blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+                foreach ((int, int) m in blackMoves){
+                    Debug.Log(m);
+                }
+            }
+        }
+
+        
+        
     }
 
     // Start is called before the first frame update
@@ -211,7 +308,8 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < 8; j++)
             {
-                tile = new Tile(i, j, Instantiate(tilePrefab, new Vector3(i * 2, j * 2, 2), Quaternion.identity));
+                tile = new Tile(i, j);
+                tile.gameObject = Instantiate(tilePrefab, new Vector3(i * 2, j * 2, 2), Quaternion.identity);
                 grid[i, j] = tile;
 
                 if ((i % 2 == 0) && (j % 2 == 0) || (j % 2 == 1) && (i % 2 == 1))
@@ -253,12 +351,12 @@ public class GameManager : MonoBehaviour
                     resetGridColors();
                     enforceState(whitePlay);
                     chosenPiece = selectedTile.piece;
-                    availableMoves = findMoves(selectedTile, grid);
+                    availableMoves = findMoves(selectedTile, grid, 0);
                     allowMoves(availableMoves, grid);
                 }
 
                 if (selectedTile.isAllowed){
-                    movePiece(chosenPiece, selectedTile);
+                    movePiece(chosenPiece, grid, selectedTile);
                     quickRender(grid);
                     whitePlay ^= true;
                     resetGridColors();

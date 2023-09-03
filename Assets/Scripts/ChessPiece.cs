@@ -43,4 +43,8 @@ public class ChessPiece{
         return _type + " " + _team + " " + _initialPosition;
     }
 
+    public ChessPiece copy(){
+        return new ChessPiece(_type, _team, _initialPosition, _i, _j);
+    }
+
 }

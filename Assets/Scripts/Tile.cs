@@ -12,10 +12,9 @@ public class Tile {
     GameObject _gameObject;
     Color _color;
 
-    public Tile(int i, int j, GameObject gameObject){
+    public Tile(int i, int j){
         _i = i;
         _j = j;
-        _gameObject = gameObject;
         _piece = null;
         _isSelectable = false;
         _color = Color.white;
@@ -29,6 +28,7 @@ public class Tile {
 
     public GameObject gameObject{
         get{return _gameObject;}
+        set{_gameObject = value;}
     }
 
     public bool isSelectable{
@@ -48,10 +48,12 @@ public class Tile {
 
     public Color color{
         get{return _color;}
+        set{_color = value;}
     }
 
     public bool isAllowed{
         get{return _isAllowed;}
+        set{_isAllowed = value;}
     }
 
     public void removePiece(){
@@ -79,5 +81,15 @@ public class Tile {
         gameObject.GetComponent<SpriteRenderer>().color = _color;
         _isSelectable = false;
         _isAllowed = false;
+    }
+
+    public Tile copy(){
+        Tile copyTile = new Tile(_i, _j);
+        copyTile.isSelectable = _isSelectable;
+        copyTile.isAllowed = _isAllowed;
+        copyTile.piece = (_piece == null) ? null : _piece.copy();
+
+        return copyTile;
+        
     }
 }
