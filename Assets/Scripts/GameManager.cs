@@ -142,13 +142,11 @@ public class GameManager : MonoBehaviour
         if (state)
         {
             sideSelect("white");
-            updateMoves("white");
         }
 
         else
         {
             sideSelect("black");
-            updateMoves("black");
         }
     }
 
@@ -215,6 +213,14 @@ public class GameManager : MonoBehaviour
     void resetGridColors(){
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++){
+                if (grid[i,j].piece != null){
+                    if (grid[i,j].piece.type == "king"){
+                        if (grid[i,j].piece.kingCheck){
+                            grid[i, j].reset();
+                            grid[i,j].lightMagenta();
+                        }
+                    }
+                }
                 grid[i, j].reset();
             }
         }
@@ -276,26 +282,23 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void updateMoves(string team){
-        if (team == "white"){
-            whiteMoves.Clear();
-            foreach (ChessPiece piece in whiteLiving)
-            {
-                whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-                foreach ((int, int) m in whiteMoves){
-                    Debug.Log(m);
-                }
+    void updateMoves(){
+        
+        whiteMoves.Clear();
+        foreach (ChessPiece piece in whiteLiving)
+        {
+            whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+            foreach ((int, int) m in whiteMoves){
+                Debug.Log("White: " + m);
             }
         }
-        
-        else{
-            blackMoves.Clear();
-            foreach (ChessPiece piece in blackLiving)
-            {
-                blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-                foreach ((int, int) m in blackMoves){
-                    Debug.Log(m);
-                }
+
+        blackMoves.Clear();
+        foreach (ChessPiece piece in blackLiving)
+        {
+            blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
+            foreach ((int, int) m in blackMoves){
+                Debug.Log("Black: "+m);
             }
         }
     }
@@ -317,7 +320,7 @@ public class GameManager : MonoBehaviour
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
             }
         }
-    } 
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -357,6 +360,8 @@ public class GameManager : MonoBehaviour
         whitePlay = true;
 
         enforceState(whitePlay);
+
+        updateMoves();
     }
 
     // Update is called once per frame
@@ -364,7 +369,6 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-
             enforceState(whitePlay);
 
             selectedTile = findSelectedTile();
@@ -383,7 +387,8 @@ public class GameManager : MonoBehaviour
                     quickRender(grid);
                     whitePlay ^= true;
                     resetGridColors();
-                    kingCheck(!whitePlay);
+                    updateMoves();
+                    kingCheck(whitePlay);
                 }
             }
         }
