@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
     private List<ChessPiece> blackLiving = new List<ChessPiece>();
     private List<(int, int)> whiteMoves = new List<(int, int)>();
     private List<(int, int)> blackMoves = new List<(int, int)>();
+    private ChessPiece whiteKing;
+    private ChessPiece blackKing;
     
 
     void addInitialPieces()
@@ -54,12 +56,17 @@ public class GameManager : MonoBehaviour
 
         chessPieces[++a] = new ChessPiece("queen", "white", 'n', 3, 0);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[4], new Vector3(-10, -10, 1), Quaternion.identity);
+
         chessPieces[++a] = new ChessPiece("queen", "black", 'n', 3, 7);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[10], new Vector3(-10, -10, 1), Quaternion.identity);
+
         chessPieces[++a] = new ChessPiece("king", "white", 'n', 4, 0);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[5], new Vector3(-10, -10, 1), Quaternion.identity);
+        whiteKing = chessPieces[a];
+
         chessPieces[++a] = new ChessPiece("king", "black", 'n', 4, 7);
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[11], new Vector3(-10, -10, 1), Quaternion.identity);
+        blackKing = chessPieces[a];
 
         foreach (ChessPiece piece in chessPieces){
             if(piece.team == "white"){
@@ -291,10 +298,26 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-
-        
-        
     }
+
+    void kingCheck(bool white){
+        if (white){
+            (int, int) kingTile = (whiteKing.i, whiteKing.j);
+            foreach ((int, int) m in blackMoves)
+            {
+                if (m == kingTile)
+                    grid[kingTile.Item1, kingTile.Item2].lightMagenta();
+            }
+        }
+        else{
+            (int, int) kingTile = (blackKing.i, blackKing.j);
+            foreach ((int, int) m in whiteMoves)
+            {
+                if (m == kingTile)
+                    grid[kingTile.Item1, kingTile.Item2].lightMagenta();
+            }
+        }
+    } 
 
     // Start is called before the first frame update
     void Start()
@@ -360,6 +383,7 @@ public class GameManager : MonoBehaviour
                     quickRender(grid);
                     whitePlay ^= true;
                     resetGridColors();
+                    kingCheck(!whitePlay);
                 }
             }
         }
