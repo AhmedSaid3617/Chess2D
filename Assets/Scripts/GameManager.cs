@@ -27,7 +27,8 @@ public class GameManager : MonoBehaviour
     private List<(int, int)> blackMoves = new List<(int, int)>();
     private ChessPiece whiteKing;
     private ChessPiece blackKing;
-    
+    private bool gameOver = false;
+
 
     void addInitialPieces()
     {
@@ -68,11 +69,14 @@ public class GameManager : MonoBehaviour
         chessPieces[a].gameObject = Instantiate(piecesPrefabs[11], new Vector3(-10, -10, 1), Quaternion.identity);
         blackKing = chessPieces[a];
 
-        foreach (ChessPiece piece in chessPieces){
-            if(piece.team == "white"){
+        foreach (ChessPiece piece in chessPieces)
+        {
+            if (piece.team == "white")
+            {
                 whiteLiving.Add(piece);
             }
-            else{
+            else
+            {
                 blackLiving.Add(piece);
             }
         }
@@ -150,96 +154,120 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    List<(int, int)> findMoves(Tile tile, Tile[,] grid, int recursionLevel){
+    List<(int, int)> findMoves(Tile tile, Tile[,] grid, int recursionLevel)
+    {
         List<(int, int)> moves = new List<(int, int)>();
         int i = tile.i;
         int j = tile.j;
 
-        if (tile.piece.type == "pawn"){
+        if (tile.piece.type == "pawn")
+        {
             moves = movesObject.pawnMoves(tile, grid, i, j);
         }
 
-        else if (tile.piece.type == "rook"){
+        else if (tile.piece.type == "rook")
+        {
             moves = movesObject.rookMoves(tile, grid, i, j);
         }
 
-        else if (tile.piece.type == "bishop"){
+        else if (tile.piece.type == "bishop")
+        {
             moves = movesObject.bishopMoves(tile, grid, i, j);
         }
 
-        else if (tile.piece.type == "queen"){
+        else if (tile.piece.type == "queen")
+        {
             moves = movesObject.rookMoves(tile, grid, i, j);
             moves.AddRange(movesObject.bishopMoves(tile, grid, i, j));
         }
 
-        else if (tile.piece.type == "king"){
+        else if (tile.piece.type == "king")
+        {
             moves = movesObject.kingMoves(tile, grid, i, j);
         }
 
-        else if (tile.piece.type == "knight"){
+        else if (tile.piece.type == "knight")
+        {
             moves = movesObject.knightMoves(tile, grid, i, j);
         }
 
-        for (int k=moves.Count-1; k>=0; k--){
-            
-            if(movesObject.isBlocked(moves[k].Item1, moves[k].Item2, tile.piece.team, grid)){
+        for (int k = moves.Count - 1; k >= 0; k--)
+        {
+
+            if (movesObject.isBlocked(moves[k].Item1, moves[k].Item2, tile.piece.team, grid))
+            {
                 moves.RemoveAt(k);
             }
         }
-        if (recursionLevel == 0){
-            for (int k=moves.Count-1; k>=0; k--){
-                if(isKingThreatning(moves[k], grid, tile, recursionLevel)){
+        if (recursionLevel == 0)
+        {
+            for (int k = moves.Count - 1; k >= 0; k--)
+            {
+                if (isKingThreatning(moves[k], grid, tile, recursionLevel))
+                {
                     moves.RemoveAt(k);
                 }
             }
         }
-        
-        
+
+
         return moves;
     }
 
     void allowMoves(List<(int, int)> moves, Tile[,] grid)
     {
         Tile tile;
-        for(int k=0; k<moves.Count; k++){
+        for (int k = 0; k < moves.Count; k++)
+        {
             tile = grid[moves[k].Item1, moves[k].Item2];
             tile.lightUP();
-            if (tile.piece != null){
+            if (tile.piece != null)
+            {
                 tile.lightRed();
             }
         }
     }
 
-    void resetGridColors(){
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                if (grid[i,j].piece != null){
-                    if (grid[i,j].piece.kingCheck){
+    void resetGridColors()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i, j].piece != null)
+                {
+                    if (grid[i, j].piece.kingCheck)
+                    {
                         grid[i, j].reset();
-                        grid[i,j].lightMagenta();
+                        grid[i, j].lightMagenta();
                         continue;
                     }
                 }
-                
+
                 grid[i, j].reset();
             }
         }
     }
 
-    void killPiece(ChessPiece piece){
-        if (piece.team == "white"){
+    void killPiece(ChessPiece piece)
+    {
+        if (piece.team == "white")
+        {
             whiteLiving.Remove(piece);
             whiteDead.Add(piece);
         }
-        else{
+        else
+        {
             blackLiving.Remove(piece);
             blackDead.Add(piece);
         }
         Destroy(piece.gameObject);
     }
 
-    void movePiece(ChessPiece piece, Tile[,] grid, Tile tile){
-        if(tile.piece != null){
+    void movePiece(ChessPiece piece, Tile[,] grid, Tile tile)
+    {
+        if (tile.piece != null)
+        {
             killPiece(tile.piece);
         }
         tile.piece = piece;
@@ -248,27 +276,37 @@ public class GameManager : MonoBehaviour
         piece.j = tile.j;
     }
 
-    bool isKingThreatning((int , int) move, Tile[,] grid, Tile origin, int recursionLevel){
+    bool isKingThreatning((int, int) move, Tile[,] grid, Tile origin, int recursionLevel)
+    {
         Tile[,] new_grid = new Tile[8, 8];
         string team = origin.piece.team;
-        List<(int, int)> enemy_moves = new List<(int,int)>();
+        List<(int, int)> enemy_moves = new List<(int, int)>();
 
-        for(int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
                 new_grid[i, j] = grid[i, j].copy();
             }
         }
 
         movePiece(new_grid[origin.i, origin.j].piece, new_grid, new_grid[move.Item1, move.Item2]);
 
-        for(int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                if(new_grid[i, j].piece != null){
-                    if(new_grid[i, j].piece.team != team){
-                        enemy_moves = findMoves(new_grid[i, j], new_grid, recursionLevel+1);
-                        foreach ((int, int)m in enemy_moves){
-                            if(new_grid[m.Item1, m.Item2].piece != null){
-                                if(new_grid[m.Item1, m.Item2].piece.type == "king"){
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (new_grid[i, j].piece != null)
+                {
+                    if (new_grid[i, j].piece.team != team)
+                    {
+                        enemy_moves = findMoves(new_grid[i, j], new_grid, recursionLevel + 1);
+                        foreach ((int, int) m in enemy_moves)
+                        {
+                            if (new_grid[m.Item1, m.Item2].piece != null)
+                            {
+                                if (new_grid[m.Item1, m.Item2].piece.type == "king")
+                                {
                                     return true;
                                 }
                             }
@@ -282,13 +320,15 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void updateMoves(){
-        
+    void updateMoves()
+    {
+
         whiteMoves.Clear();
         foreach (ChessPiece piece in whiteLiving)
         {
             whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-            foreach ((int, int) m in whiteMoves){
+            foreach ((int, int) m in whiteMoves)
+            {
                 Debug.Log("White: " + m);
             }
         }
@@ -297,28 +337,47 @@ public class GameManager : MonoBehaviour
         foreach (ChessPiece piece in blackLiving)
         {
             blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-            foreach ((int, int) m in blackMoves){
-                Debug.Log("Black: "+m);
+            foreach ((int, int) m in blackMoves)
+            {
+                Debug.Log("Black: " + m);
             }
         }
     }
 
-    void kingCheck(bool white){
-        if (white){
+    void endGame()
+    {
+        gameOver = true;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                grid[i, j].isSelectable = false;
+                grid[i, j].isAllowed = false;
+            }
+        }
+    }
+
+    void kingCheck(bool white)
+    {
+        if (white)
+        {
             (int, int) kingTile = (whiteKing.i, whiteKing.j);
             foreach ((int, int) m in blackMoves)
             {
-                if (m == kingTile){
+                if (m == kingTile)
+                {
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
                     grid[kingTile.Item1, kingTile.Item2].piece.kingCheck = true;
-                }   
+                }
             }
         }
-        else{
+        else
+        {
             (int, int) kingTile = (blackKing.i, blackKing.j);
             foreach ((int, int) m in whiteMoves)
             {
-                if (m == kingTile){
+                if (m == kingTile)
+                {
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
                     grid[kingTile.Item1, kingTile.Item2].piece.kingCheck = true;
                 }
@@ -371,36 +430,49 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!gameOver)
         {
-            enforceState(whitePlay);
+            if (Input.GetMouseButtonDown(0))
+            {
+                enforceState(whitePlay);
 
-            selectedTile = findSelectedTile();
-            if (selectedTile != null){
+                selectedTile = findSelectedTile();
+                if (selectedTile != null)
+                {
 
-                if (selectedTile.isSelectable){
-                    resetGridColors();
-                    enforceState(whitePlay);
-                    chosenPiece = selectedTile.piece;
-                    availableMoves = findMoves(selectedTile, grid, 0);
-                    allowMoves(availableMoves, grid);
-                }
+                    if (selectedTile.isSelectable)
+                    {
+                        resetGridColors();
+                        enforceState(whitePlay);
+                        chosenPiece = selectedTile.piece;
+                        availableMoves = findMoves(selectedTile, grid, 0);
+                        allowMoves(availableMoves, grid);
+                    }
 
-                if (selectedTile.isAllowed){
-                    movePiece(chosenPiece, grid, selectedTile);
-                    quickRender(grid);
-                    whitePlay ^= true;
-                    whiteKing.kingCheck = false;
-                    blackKing.kingCheck = false;
-                    resetGridColors();
-                    updateMoves();
-                    kingCheck(whitePlay);
+                    if (selectedTile.isAllowed)
+                    {
+                        movePiece(chosenPiece, grid, selectedTile);
+                        quickRender(grid);
+                        whitePlay ^= true;
+                        whiteKing.kingCheck = false;
+                        blackKing.kingCheck = false;
+                        resetGridColors();
+                        updateMoves();
+                        kingCheck(whitePlay);
+                    }
                 }
             }
+
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                resetGridColors();
+            }
+
+        }
+        if (Input.GetKey(KeyCode.N))
+        {
+            endGame();
         }
 
-        if (Input.GetKey(KeyCode.Escape)){
-            resetGridColors();
-        }
     }
 }
