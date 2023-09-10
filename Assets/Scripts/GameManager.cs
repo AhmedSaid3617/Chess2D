@@ -214,13 +214,13 @@ public class GameManager : MonoBehaviour
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++){
                 if (grid[i,j].piece != null){
-                    if (grid[i,j].piece.type == "king"){
-                        if (grid[i,j].piece.kingCheck){
-                            grid[i, j].reset();
-                            grid[i,j].lightMagenta();
-                        }
+                    if (grid[i,j].piece.kingCheck){
+                        grid[i, j].reset();
+                        grid[i,j].lightMagenta();
+                        continue;
                     }
                 }
+                
                 grid[i, j].reset();
             }
         }
@@ -308,16 +308,20 @@ public class GameManager : MonoBehaviour
             (int, int) kingTile = (whiteKing.i, whiteKing.j);
             foreach ((int, int) m in blackMoves)
             {
-                if (m == kingTile)
+                if (m == kingTile){
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
+                    grid[kingTile.Item1, kingTile.Item2].piece.kingCheck = true;
+                }   
             }
         }
         else{
             (int, int) kingTile = (blackKing.i, blackKing.j);
             foreach ((int, int) m in whiteMoves)
             {
-                if (m == kingTile)
+                if (m == kingTile){
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
+                    grid[kingTile.Item1, kingTile.Item2].piece.kingCheck = true;
+                }
             }
         }
     }
@@ -386,6 +390,8 @@ public class GameManager : MonoBehaviour
                     movePiece(chosenPiece, grid, selectedTile);
                     quickRender(grid);
                     whitePlay ^= true;
+                    whiteKing.kingCheck = false;
+                    blackKing.kingCheck = false;
                     resetGridColors();
                     updateMoves();
                     kingCheck(whitePlay);
