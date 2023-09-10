@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class GameManager : MonoBehaviour
     private Tile[,] grid;
     public Vector2 detectionBoxSize = new Vector2(0.2f, 0.2f);
     public Camera mainCamera;
+    public GameObject gameOverText;
     private Vector3 mousePosition;
     private Vector2 mouseWorldPosition;
     private Collider2D selectedTileColl;
@@ -344,19 +347,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void endGame()
-    {
-        gameOver = true;
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                grid[i, j].isSelectable = false;
-                grid[i, j].isAllowed = false;
-            }
-        }
-    }
-
     void kingCheck(bool white)
     {
         if (white)
@@ -380,6 +370,37 @@ public class GameManager : MonoBehaviour
                 {
                     grid[kingTile.Item1, kingTile.Item2].lightMagenta();
                     grid[kingTile.Item1, kingTile.Item2].piece.kingCheck = true;
+                }
+            }
+        }
+    }
+
+    void endGame(string winner)
+    {
+        gameOver = true;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                grid[i, j].isSelectable = false;
+                grid[i, j].isAllowed = false;
+            }
+        }
+        gameOverText.GetComponent<TextMeshProUGUI>().text = winner;
+    }
+
+    void findWinner(){
+        if (!whitePlay){
+            if (blackMoves.Count == 0){
+                if (blackKing.kingCheck){
+                    endGame("White wins!");
+                }
+            }
+        }
+        else{
+            if (whiteMoves.Count == 0){
+                if (whiteKing.kingCheck){
+                    endGame("Black wins!");
                 }
             }
         }
@@ -459,6 +480,7 @@ public class GameManager : MonoBehaviour
                         resetGridColors();
                         updateMoves();
                         kingCheck(whitePlay);
+                        findWinner();
                     }
                 }
             }
@@ -471,7 +493,7 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.N))
         {
-            endGame();
+            endGame("White Wins");
         }
 
     }
