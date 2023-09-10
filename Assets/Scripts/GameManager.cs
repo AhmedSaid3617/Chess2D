@@ -395,6 +395,7 @@ public class GameManager : MonoBehaviour
                 if (blackKing.kingCheck){
                     endGame("White wins!");
                 }
+                endGame("Draw");
             }
         }
         else{
@@ -402,6 +403,7 @@ public class GameManager : MonoBehaviour
                 if (whiteKing.kingCheck){
                     endGame("Black wins!");
                 }
+                endGame("Draw");
             }
         }
     }
