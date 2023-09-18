@@ -395,7 +395,10 @@ public class GameManager : MonoBehaviour
                 if (blackKing.kingCheck){
                     endGame("White wins!");
                 }
-                endGame("Draw");
+                else{
+                    endGame("Draw");
+                }
+                
             }
         }
         else{
@@ -403,7 +406,10 @@ public class GameManager : MonoBehaviour
                 if (whiteKing.kingCheck){
                     endGame("Black wins!");
                 }
-                endGame("Draw");
+                else {
+                    endGame("Draw");
+                }
+                
             }
         }
     }
@@ -492,10 +498,6 @@ public class GameManager : MonoBehaviour
                 resetGridColors();
             }
 
-        }
-        if (Input.GetKey(KeyCode.N))
-        {
-            endGame("White Wins");
         }
 
     }
