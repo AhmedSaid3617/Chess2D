@@ -7,6 +7,7 @@ public class Tile {
 
     bool _isSelectable;
     bool _isAllowed;
+    bool _isCastle;
 
     ChessPiece _piece;
     GameObject _gameObject;
@@ -56,6 +57,11 @@ public class Tile {
         set{_isAllowed = value;}
     }
 
+    public bool isCastle{
+        get{return _isCastle;}
+        set{_isCastle = value;}
+    }
+
     public void removePiece(){
         _piece = null;
     }
@@ -85,6 +91,7 @@ public class Tile {
         gameObject.GetComponent<SpriteRenderer>().color = _color;
         _isSelectable = false;
         _isAllowed = false;
+        _isCastle = false;
     }
 
     public Tile copy(){

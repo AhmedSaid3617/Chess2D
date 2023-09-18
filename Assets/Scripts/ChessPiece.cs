@@ -7,6 +7,7 @@ public class ChessPiece{
     char _initialPosition;
     int _i, _j;
     bool _kingCheck = false;
+    int _numMoves = 0;
     GameObject _gameObject;
 
     public ChessPiece(string type, string team, char initialPosition, int i, int j){
@@ -43,6 +44,11 @@ public class ChessPiece{
     public bool kingCheck{
         get {return _kingCheck;}
         set {_kingCheck = value;}
+    }
+
+    public int numMoves{
+        get {return _numMoves;}
+        set {_numMoves = value;}
     }
     
     public string toString(){

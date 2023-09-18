@@ -227,4 +227,32 @@ public class Moves
         return moves;
     }
 
+    public List<(int, int)> findCastles(Tile tile, Tile[,] grid, List<(int, int)> enemyMoves,int i, int j){
+        List<(int, int)> castles = new List<(int, int)>();
+
+        if (grid[7, j].piece != null){
+            if (grid[7, j].piece.numMoves == 0){
+                if (grid[5, j].piece == null && grid[6, j].piece == null){
+                    if (!(enemyMoves.Contains((5, j)) || enemyMoves.Contains((6, j)))){
+                        castles.Add((7, j));
+                        grid[7, j].isCastle = true;
+                    }
+                }
+            }
+        }
+
+        if (grid[0, j].piece != null){
+            if (grid[0, j].piece.numMoves == 0){
+                if (grid[1, j].piece == null && grid[2, j].piece == null && grid[3, j].piece == null){
+                    if (!(enemyMoves.Contains((1, j)) || enemyMoves.Contains((2, j)) || enemyMoves.Contains((3, j)))){
+                        castles.Add((0, j));
+                        grid[0, j].isCastle = true;
+                    }
+                }
+            }
+        }
+
+        return castles;
+    }
+
 }

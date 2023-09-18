@@ -187,6 +187,11 @@ public class GameManager : MonoBehaviour
         else if (tile.piece.type == "king")
         {
             moves = movesObject.kingMoves(tile, grid, i, j);
+            
+            if(tile.piece.numMoves==0){
+                List<(int, int)> enemyMoves = (tile.piece.team == "white")?blackMoves:whiteMoves;
+                moves.AddRange(movesObject.findCastles(tile, grid, enemyMoves, i, j));
+            }
         }
 
         else if (tile.piece.type == "knight")
@@ -196,6 +201,11 @@ public class GameManager : MonoBehaviour
 
         for (int k = moves.Count - 1; k >= 0; k--)
         {
+            if (!movesObject.outOfRange(moves[k].Item1, moves[k].Item2)){
+                Debug.Log(moves[k]);
+                if (grid[moves[k].Item1, moves[k].Item2].isCastle)
+                    continue;
+            }
 
             if (movesObject.isBlocked(moves[k].Item1, moves[k].Item2, tile.piece.team, grid))
             {
@@ -213,11 +223,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
-
         return moves;
     }
 
-    void allowMoves(List<(int, int)> moves, Tile[,] grid)
+    void allowMoves(List<(int, int)> moves, Tile[,] grid, ChessPiece piece)
     {
         Tile tile;
         for (int k = 0; k < moves.Count; k++)
@@ -226,7 +235,12 @@ public class GameManager : MonoBehaviour
             tile.lightUP();
             if (tile.piece != null)
             {
-                tile.lightRed();
+                if(tile.piece.team != piece.team)
+                    tile.lightRed();
+                
+                else{
+                    tile.lightUP();
+                }
             }
         }
     }
@@ -277,6 +291,7 @@ public class GameManager : MonoBehaviour
         grid[piece.i, piece.j].removePiece();
         piece.i = tile.i;
         piece.j = tile.j;
+        piece.numMoves += 1;
     }
 
     bool isKingThreatning((int, int) move, Tile[,] grid, Tile origin, int recursionLevel)
@@ -330,20 +345,12 @@ public class GameManager : MonoBehaviour
         foreach (ChessPiece piece in whiteLiving)
         {
             whiteMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-            foreach ((int, int) m in whiteMoves)
-            {
-                Debug.Log("White: " + m);
-            }
         }
 
         blackMoves.Clear();
         foreach (ChessPiece piece in blackLiving)
         {
             blackMoves.AddRange(findMoves(grid[piece.i, piece.j], grid, 0));
-            foreach ((int, int) m in blackMoves)
-            {
-                Debug.Log("Black: " + m);
-            }
         }
     }
 
@@ -475,7 +482,7 @@ public class GameManager : MonoBehaviour
                         enforceState(whitePlay);
                         chosenPiece = selectedTile.piece;
                         availableMoves = findMoves(selectedTile, grid, 0);
-                        allowMoves(availableMoves, grid);
+                        allowMoves(availableMoves, grid, chosenPiece);
                     }
 
                     if (selectedTile.isAllowed)
