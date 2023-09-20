@@ -202,7 +202,6 @@ public class GameManager : MonoBehaviour
         for (int k = moves.Count - 1; k >= 0; k--)
         {
             if (!movesObject.outOfRange(moves[k].Item1, moves[k].Item2)){
-                Debug.Log(moves[k]);
                 if (grid[moves[k].Item1, moves[k].Item2].isCastle)
                     continue;
             }
@@ -281,17 +280,23 @@ public class GameManager : MonoBehaviour
         Destroy(piece.gameObject);
     }
 
-    void movePiece(ChessPiece piece, Tile[,] grid, Tile tile)
+    void movePiece(ChessPiece piece, Tile[,] grid, Tile tile, bool recursion)
     {
-        if (tile.piece != null)
-        {
-            killPiece(tile.piece);
+        if (tile.isCastle && piece.type == "king" && !recursion){
+            castle(piece, tile);
         }
-        tile.piece = piece;
-        grid[piece.i, piece.j].removePiece();
-        piece.i = tile.i;
-        piece.j = tile.j;
-        piece.numMoves += 1;
+
+        else{
+            if (tile.piece != null)
+            {
+                killPiece(tile.piece);
+            }
+            tile.piece = piece;
+            grid[piece.i, piece.j].removePiece();
+            piece.i = tile.i;
+            piece.j = tile.j;
+            piece.numMoves += 1;
+        }
     }
 
     bool isKingThreatning((int, int) move, Tile[,] grid, Tile origin, int recursionLevel)
@@ -308,7 +313,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        movePiece(new_grid[origin.i, origin.j].piece, new_grid, new_grid[move.Item1, move.Item2]);
+        movePiece(new_grid[origin.i, origin.j].piece, new_grid, new_grid[move.Item1, move.Item2], false);
 
         for (int i = 0; i < 8; i++)
         {
@@ -421,6 +426,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void castle(ChessPiece king, Tile tile){
+        if(tile.i == 7){
+            movePiece(king, grid, grid[6,king.j], true);
+            movePiece(tile.piece, grid, grid[5, king.j], true);
+        }
+        else{
+            movePiece(king, grid, grid[1, king.j], true);
+            movePiece(tile.piece, grid, grid[3, king.j], true);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -475,19 +491,9 @@ public class GameManager : MonoBehaviour
                 selectedTile = findSelectedTile();
                 if (selectedTile != null)
                 {
-
-                    if (selectedTile.isSelectable)
-                    {
-                        resetGridColors();
-                        enforceState(whitePlay);
-                        chosenPiece = selectedTile.piece;
-                        availableMoves = findMoves(selectedTile, grid, 0);
-                        allowMoves(availableMoves, grid, chosenPiece);
-                    }
-
                     if (selectedTile.isAllowed)
                     {
-                        movePiece(chosenPiece, grid, selectedTile);
+                        movePiece(chosenPiece, grid, selectedTile, false);
                         quickRender(grid);
                         whitePlay ^= true;
                         whiteKing.kingCheck = false;
@@ -496,6 +502,15 @@ public class GameManager : MonoBehaviour
                         updateMoves();
                         kingCheck(whitePlay);
                         findWinner();
+                    }
+
+                    if (selectedTile.isSelectable)
+                    {
+                        resetGridColors();
+                        enforceState(whitePlay);
+                        chosenPiece = selectedTile.piece;
+                        availableMoves = findMoves(selectedTile, grid, 0);
+                        allowMoves(availableMoves, grid, chosenPiece);
                     }
                 }
             }
