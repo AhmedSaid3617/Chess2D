@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TMPro;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -14,6 +16,7 @@ public class GameManager : MonoBehaviour
     public Vector2 detectionBoxSize = new Vector2(0.2f, 0.2f);
     public Camera mainCamera;
     public GameObject gameOverText;
+    public GameObject replayButton;
     private Vector3 mousePosition;
     private Vector2 mouseWorldPosition;
     private Collider2D selectedTileColl;
@@ -399,6 +402,7 @@ public class GameManager : MonoBehaviour
             }
         }
         gameOverText.GetComponent<TextMeshProUGUI>().text = winner;
+        replayButton.SetActive(true);
     }
 
     void findWinner(){
